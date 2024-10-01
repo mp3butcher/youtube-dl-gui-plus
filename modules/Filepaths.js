@@ -23,6 +23,8 @@ class Filepaths {
                 this.taskList = this.app.isPackaged ? path.join(this.unpackedPrefix, "taskList") : "taskList";
                 this.ytdlVersion = this.app.isPackaged ? path.join(this.unpackedPrefix, "binaries/ytdlVersion") :"binaries/ytdlVersion";
                 this.ffmpegVersion = this.app.isPackaged ? path.join(this.unpackedPrefix, "binaries/ffmpegVersion") :"binaries/ffmpegVersion";
+                this.mitmproxy = this.app.isPackaged ? path.join(this.unpackedPrefix, "binaries") : "binaries";
+                this.mitmproxyVersion = this.app.isPackaged ? path.join(this.unpackedPrefix, "binaries/mitmproxyVersion") :"binaries/mitmproxyVersion";
                 break;
             case "win32app": {
                 const appDir = path.basename(path.join(this.appPath, "../../..")).replace(/_(.*)_/g, "_");
@@ -38,6 +40,8 @@ class Filepaths {
                 this.taskList = path.join(this.binaryPath, "taskList");
                 this.ytdlVersion = path.join(this.binaryPath, "ytdlVersion");
                 this.ffmpegVersion = path.join(this.binaryPath, "ffmpegVersion");
+                this.mitmproxy = this.binaryPath;
+                this.mitmproxyVersion = path.join(this.binaryPath, "mitmproxyVersion");
                 break;
             }
             case "win32portable":
@@ -52,6 +56,8 @@ class Filepaths {
                 this.taskList = path.join(this.persistentPath, "taskList");
                 this.ytdlVersion = path.join(this.persistentPath, "ytdlVersion");
                 this.ffmpegVersion = path.join(this.persistentPath, "ffmpegVersion");
+                this.mitmproxy = this.persistentPath;
+                this.mitmproxyVersion = path.join(this.persistentPath, "mitmproxyVersion");
                 break;
             case "darwin":
                 this.packedPrefix = this.appPath;
@@ -63,6 +69,8 @@ class Filepaths {
                 this.taskList = this.app.isPackaged ? path.join(this.unpackedPrefix, "taskList") : "taskList";
                 this.ytdlVersion = this.app.isPackaged ? path.join(this.unpackedPrefix, "binaries/ytdlVersion") :"binaries/ytdlVersion";
                 this.ffmpegVersion = this.app.isPackaged ? path.join(this.unpackedPrefix, "binaries/ffmpegVersion") :"binaries/ffmpegVersion";
+                this.mitmproxy = this.app.isPackaged ? path.join(this.unpackedPrefix, "binaries") : "binaries";
+                this.mitmproxyVersion =  this.app.isPackaged ? path.join(this.unpackedPrefix, "binaries/mitmproxyVersion") :"binaries/mitmproxyVersion";
                 this.setPermissions()
                 break;
             case "linux":
@@ -77,6 +85,8 @@ class Filepaths {
                 this.taskList = this.app.isPackaged ? path.join(this.persistentPath, "taskList") : "taskList";
                 this.ytdlVersion = this.app.isPackaged ? path.join(this.persistentPath, "ytdlVersion") :"binaries/ytdlVersion";
                 this.ffmpegVersion = this.app.isPackaged ? path.join(this.persistentPath, "ffmpegVersion") :"binaries/ffmpegVersion";
+                this.mitmproxy = this.app.isPackaged ? this.persistentPath : "binaries";
+                this.mitmproxyVersion =  this.app.isPackaged ? path.join(this.persistentPath, "mitmproxyVersion") :"binaries/mitmproxyVersion";
                 this.setPermissions()
                 break;
         }

@@ -9,6 +9,8 @@ const TaskList = require("./modules/persistence/TaskList");
 const DoneAction = require("./modules/DoneAction");
 const ClipboardWatcher = require("./modules/ClipboardWatcher");
 const FfmpegUpdater = require('./modules/FfmpegUpdater');
+const MitmProxyUpdater = require('./modules/MitmProxyUpdater');
+const amqp = require('amqplib');
 
 let win
 let env
@@ -16,14 +18,16 @@ let queryManager
 let clipboardWatcher
 let taskList
 let appStarting = true;
+let scannerIsOn = false;
+let mitmwebprocess;
 
 function sendLogToRenderer(log, isErr) {
-    if(win == null) return;
-    win.webContents.send("log", {log: log, isErr: isErr});
+    if (win == null) return;
+    win.webContents.send("log", { log: log, isErr: isErr });
 }
 
 function startCriticalHandlers(env) {
-     env.win = win;
+    env.win = win;
 
     win.on('maximize', () => {
         win.webContents.send("maximized", true)
@@ -45,28 +49,31 @@ function startCriticalHandlers(env) {
 
     taskList = new TaskList(env.paths, queryManager)
 
-    if(env.settings.updateBinary) {
+    if (env.settings.updateBinary) {
         const binaryUpdater = new BinaryUpdater(env.paths, win);
         const ffmpegUpdater = new FfmpegUpdater(env.paths, win);
-        win.webContents.send("binaryLock", {lock: true, placeholder: `Checking for a new version of ffmpeg...`})
+        const mitmproxyUpdater = new MitmProxyUpdater(env.paths, win);
+        win.webContents.send("binaryLock", { lock: true, placeholder: `Checking for a new version of ffmpeg...` })
         ffmpegUpdater.checkUpdate().finally(() => {
-            win.webContents.send("binaryLock", {lock: true, placeholder: `Checking for a new version of yt-dlp...`})
+            win.webContents.send("binaryLock", { lock: true, placeholder: `Checking for a new version of yt-dlp...` })
             binaryUpdater.checkUpdate().finally(() => {
-                win.webContents.send("binaryLock", {lock: false});
+                win.webContents.send("binaryLock", { lock: false });
+                mitmproxyUpdater.checkUpdate().finally(() => {
                 taskList.load();
                 clipboardWatcher.startPolling();
+                });
             });
         });
-    } else if(env.settings.taskList) {
+    } else if (env.settings.taskList) {
         taskList.load();
     }
 
     //Send the saved download type to the renderer
-    win.webContents.send("videoAction", {action: "setDownloadType", type: env.settings.downloadType});
+    win.webContents.send("videoAction", { action: "setDownloadType", type: env.settings.downloadType });
 
     env.errorHandler = new ErrorHandler(win, queryManager, env);
 
-    if(appStarting) {
+    if (appStarting) {
         appStarting = false;
 
         //Restore the videos from last session
@@ -98,8 +105,8 @@ function startCriticalHandlers(env) {
 
         ipcMain.handle('iconProgress', (event, args) => {
             win.setProgressBar(args);
-            if(args === 1) {
-                if(process.platform === "darwin") app.dock.bounce();
+            if (args === 1) {
+                if (process.platform === "darwin") app.dock.bounce();
                 else win.flashFrame(true);
                 win.setProgressBar(-1);
             }
@@ -110,14 +117,14 @@ function startCriticalHandlers(env) {
                 case "get":
                     return env.settings.serialize();
                 case "save":
-                    env.settings.update(args.settings);
+                    env.settings.update(args.setting);
                     break;
             }
         })
 
         let appUpdater = new AppUpdater(env, win);
         env.appUpdater = appUpdater;
-        if(!env.paths.appPath.includes("\\AppData\\Local\\Temp\\") && !env.paths.appPath.includes("WindowsApps")) {
+        if (!env.paths.appPath.includes("\\AppData\\Local\\Temp\\") && !env.paths.appPath.includes("WindowsApps")) {
             //Don't check the app when it is in portable mode
             appUpdater.checkUpdate();
         }
@@ -148,11 +155,11 @@ function startCriticalHandlers(env) {
                     break;
                 case "download":
                     if (args.downloadType === "all") queryManager.downloadAllVideos(args)
-                    else if(args.downloadType === "unified") queryManager.downloadUnifiedPlaylist(args);
-                    else if(args.downloadType === "single") queryManager.downloadVideo(args);
+                    else if (args.downloadType === "unified") queryManager.downloadUnifiedPlaylist(args);
+                    else if (args.downloadType === "single") queryManager.downloadVideo(args);
                     break;
                 case "entry":
-                    queryManager.manage(args.url);
+                    queryManager.manage(args.url, args.headers ? args.headers : []);
                     break;
                 case "info":
                     queryManager.showInfo(args.identifier);
@@ -180,6 +187,7 @@ function startCriticalHandlers(env) {
 
 //Create the window for the renderer process
 function createWindow(env) {
+
     win = new BrowserWindow({
         show: false,
         minWidth: 840,
@@ -199,26 +207,127 @@ function createWindow(env) {
             contextIsolation: true
         }
     })
-    if(process.argv[2] === '--dev') {
+    if (process.argv[2] === '--dev') {
         win.webContents.openDevTools()
     }
     win.loadFile(path.join(__dirname, "renderer/renderer.html"))
     win.on('closed', () => {
+        if(scannerIsOn) process.kill(-mitmwebprocess.pid);
         win = null
-    })
-    win.once('focus', () => win.flashFrame(false))
+    });
+    win.once('focus', () => {
+        win.flashFrame(false)
+    });
     win.webContents.on('did-finish-load', () => {
         win.show();
-        startCriticalHandlers(env)
+        startCriticalHandlers(env);
     });
 }
 
+function scan(msg) {
+    if (scannerIsOn) {
+        let data;
+        try {
+            data = JSON.parse(msg.content);
+        } catch (e) {
+            return console.error(e); //Error in the above string (in this case, yes)!
+        }
+        //Basic scanner
+        let sizeok = false;   //Check if range is not prohibitively small
+        let contentype = "";
+        let contentlength = 0;
+        let headerstr = '';
+        data.headers.forEach(h => {
+            headerstr = headerstr + h.k + ": " + h.v + '$';
+            if (h.k.toLowerCase() == "range") {
+                const regexprange = /bytes=(\d+)-(\d+)?\/?(\d+)?/g;
+                const ranges = [...h.v.matchAll(regexprange)];
+                console.log(ranges[0]);
+                if (typeof (ranges[1]) == "undefined") contentlength = 20000000;
+                else contentlength = parseInt(ranges[1], 10) - parseInt(ranges[0], 10);
+                if (contentlength > 1000000) sizeok = true;
+            }
+        });
+        console.log(" scan url " + data.url+" headers:" + headerstr);
+
+        data.rheaders.forEach(h => {
+            if (h.k.toLowerCase() == "content-type") contentype = h.v;
+            if (h.k.toLowerCase() == "content-length") {
+                contentlength = parseInt(h.v, 10);
+            }
+            if (h.k.toLowerCase() == "content-range") {
+
+                const regexprange = /bytes (\d+)-(\d+)?\/?(\d+)?/g;
+                const ranges = [...h.v.matchAll(regexprange)];
+                if (typeof (ranges[1]) == "undefined") contentlength = 20000000;
+                else contentlength = parseInt(ranges[1], 10) - parseInt(ranges[0], 10);
+                if (contentlength > 1000000) sizeok = true;
+            }
+        });
+        let toscandeeply = false;
+        //Large Content-type video
+        if (contentype.startsWith('video') && contentlength > 1000000) {
+            toscandeeply = true;
+            console.warn(" [x] contentype video!!!!!!!!!!!" + contentype);
+        }
+        //Large Content-Range
+        if (sizeok || contentlength > 100000) {
+            toscandeeply = true;
+        }
+        let res = atob(data.response)
+        console.log(" [x] response  " + res.substring(0, 100));
+        if (res.length > 1){
+            if (res[0] == "#") { //HLS?
+                console.log(res);
+                toscandeeply = true;
+            }
+        }
+        if (toscandeeply) queryManager.manage(data.url, data.headers);
+    }
+}
+
+function consumeChannel(channel) {
+    const queue = 'mitm-python-stream';
+    channel.assertQueue(queue, {
+        durable: false
+    });
+    console.log(" [*] Waiting for messages from proxy in %s.", queue);
+    channel.consume(queue, scan, {
+        noAck: true
+    });
+}
+
+function scanloop(connection) {
+    connection.createChannel().then(consumeChannel);
+}
+
+function connectionFailure(err) {
+    let errorstr = 'connection failed on port 5672: Make sure proxy RabbitMq is installed and mitmproxy running with dispatch script';
+    dialog.showMessageBox({ message: errorstr })
+    console.error(err);
+}
+
+function connectionError(err) {
+    console.error('Connect succeeded, but error thrown: ' + err);
+}
+
+function delay(ms){
+    const prom = new Promise(resolve => { setTimeout(resolve, ms) });
+    return prom;
+}
+
 app.on('ready', async () => {
-    app.setAppUserModelId("com.jelleglebbeek.youtube-dl-gui");
+    app.setAppUserModelId("com.mp3butcher.youtube-dl-gui");
     env = new Environment(app);
     await env.initialize();
     createWindow(env);
+
+    //Connect to RabbitMQ for mitmproxy messages
+    await delay(3000); //Delay proxy connection not to mess up
+    amqp.connect('amqp://guest:guest@localhost:5672').then(scanloop, connectionFailure)
+    .then(null, connectionError);
 })
+
 
 app.on('before-quit', async () => {
     await taskList.save();
@@ -283,6 +392,26 @@ ipcMain.handle("platform", () => {
     return process.platform;
 })
 
+//Set Traffic Scanner On/off
+ipcMain.handle("setScannerEnabled", (event, args) => {
+    console.log("enable" + args);
+    scannerIsOn = args.value;
+    const spawn = require('child_process').spawn;
+    console.log(env.settings.paths.mitmproxy);
+    if(scannerIsOn) {
+        mitmwebprocess = spawn(
+            path.join(env.settings.paths.mitmproxy, 'mitmweb'),
+            ['-q', '--anticache', '--anticomp', '-s','parse_headers.py','--listen-port','15930'],
+            {detached: true}
+        );
+        let msg = 'Proxy running on localhost on port 15930: Configure proxy in your browser to scan network';
+        dialog.showMessageBox({ message: msg });
+    } else {
+        console.log(mitmwebprocess.pid);
+        process.kill(-mitmwebprocess.pid);
+    }
+})
+
 
 //Return the available actions to the renderer process
 ipcMain.handle('getDoneActions', () => {
@@ -297,12 +426,12 @@ ipcMain.handle("theme", () => {
 
 //Handle titlebar click events from the renderer process
 ipcMain.handle('titlebarClick', (event, arg) => {
-    if(arg === 'close') {
+    if (arg === 'close') {
         win.close()
-    } else if(arg === "minimize") {
+    } else if (arg === "minimize") {
         win.minimize()
-    } else if(arg === "maximize") {
-        if(win.isMaximized()) win.unmaximize();
+    } else if (arg === "maximize") {
+        if (win.isMaximized()) win.unmaximize();
         else win.maximize();
     }
 })
@@ -310,14 +439,14 @@ ipcMain.handle('titlebarClick', (event, arg) => {
 //Show a dialog to select a folder, and return the selected value.
 ipcMain.handle('downloadFolder', async () => {
     await dialog.showOpenDialog(win, {
-        defaultPath:  env.settings.downloadPath,
+        defaultPath: env.settings.downloadPath,
         buttonLabel: "Set download location",
         properties: [
             'openDirectory',
             'createDirectory'
         ]
     }).then(result => {
-        if(result.filePaths[0] != null) {
+        if (result.filePaths[0] != null) {
             env.settings.downloadPath = result.filePaths[0];
             env.settings.save();
         }
@@ -325,12 +454,12 @@ ipcMain.handle('downloadFolder', async () => {
 });
 
 //Show a dialog to select a file, and return the selected value.
-ipcMain.handle('cookieFile', async (event,clear) => {
-    if(clear === true) {
+ipcMain.handle('cookieFile', async (event, clear) => {
+    if (clear === true) {
         env.settings.cookiePath = null;
         env.settings.save();
         return;
-    } else if(clear === "get") {
+    } else if (clear === "get") {
         return env.settings.cookiePath;
     }
     let result = await dialog.showOpenDialog(win, {
@@ -345,7 +474,7 @@ ipcMain.handle('cookieFile', async (event,clear) => {
             { name: "All Files", extensions: ["*"] },
         ],
     });
-    if(result.filePaths[0] != null) {
+    if (result.filePaths[0] != null) {
         env.settings.cookiePath = result.filePaths[0];
         env.settings.save();
     }

@@ -7,9 +7,13 @@
 [![downloads](https://img.shields.io/github/downloads/StefanLobbenmeier/youtube-dl-gui/total)](https://github.com/StefanLobbenmeier/youtube-dl-gui/releases/latest)
 [![CI badge](https://img.shields.io/github/actions/workflow/status/StefanLobbenmeier/youtube-dl-gui/continuous-integration.yaml)](https://github.com/StefanLobbenmeier/youtube-dl-gui/actions)
 
-https://github.com/StefanLobbenmeier/youtube-dl-gui
 
 A cross-platform GUI for youtube-dl made in Electron and node.js
+
+based on https://github.com/StefanLobbenmeier/youtube-dl-gui but adding a traffic scanning feature (using mitmprooxy and rabbitMQ interprocess communication)
+
+Unfortunately the official build of mitmproxy doesn't include amqp library so you need to use use pip version or this custom build of mitmproxy.
+
 
 
 ### Features:
@@ -20,6 +24,7 @@ A cross-platform GUI for youtube-dl made in Electron and node.js
 - Multithreaded, up to 32 videos can be downloaded synchronously
 - Shows how much size the download will use up on your system
 - The app automatically keeps ytdl up-to-date
+- The app include a network scanner through a binding with mitmproxy 
 
 Be sure to check out [a demo gif of the application](#Demo-gif)!
 
