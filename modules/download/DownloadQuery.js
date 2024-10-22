@@ -183,7 +183,7 @@ class DownloadQuery extends Query {
                     try{
                         const livrec =  liveData.match(regexliverec);
                         if (typeof (`${livrec[1]}`) == "undefined") return;
-                        this.progressBar.updateDownload('livestream', `${livrec[2]}`, `${livrec[3]}bits\/s`, this.video.audioOnly || this.video.downloadingAudio);
+                        this.progressBar.updateDownload('livestream', `${livrec[2]}`, `${livrec[3]}bits/s`, this.video.audioOnly || this.video.downloadingAudio);
                     } catch(e) {
                         return;
                     }

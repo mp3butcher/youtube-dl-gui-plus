@@ -13,8 +13,7 @@ class Query {
     stop() {
         this.stopped = true;
         if(this.process != null) {
-            if (this.progressBar.video.is_live)
-                process.kill(this.process.pid, 'SIGINT');///Only way to stop ffmpeg lives
+            if (this.progressBar.video.is_live) process.kill(this.process.pid, 'SIGINT');/// Only way to stop ffmpeg lives
             else this.process.kill();
         }
     }

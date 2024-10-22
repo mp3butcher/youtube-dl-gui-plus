@@ -360,8 +360,7 @@ function scan(msg) {
             if (res[0] == "#") { //HLS?
                 console.log(res);
                 toscandeeply = true;
-            }
-            else if (res.startsWith('<MPD')) { //DASH?
+            } else if (res.startsWith('<MPD')) { //DASH?
                 console.log(res);
                 toscandeeply = true;
             }
