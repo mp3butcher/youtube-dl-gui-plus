@@ -3,9 +3,10 @@ const path = require("path")
 const fs = require("fs");
 const Utils = require("../Utils")
 const console = require("console");
-
+const regcooki = new RegExp(/([^=]+)=([^;^,]+)(; expires=[^;]+)(; path=([^\;]+))*; domain=([^\;]+)(; Secure)*(; HttpOnly)*; priority=[^;^,]+(; SameSite=([^\,]+))*,?/gm);
+  
 class DownloadQuery extends Query {
-    constructor(url, headers, video, environment, progressBar, playlistMeta) {
+    constructor(url, headers, rheaders, video, environment, progressBar, playlistMeta) {
         super(environment, video.identifier);
         this.playlistMeta = playlistMeta;
         this.url = url;
@@ -13,6 +14,21 @@ class DownloadQuery extends Query {
         this.progressBar = progressBar;
         this.format = video.formats[video.selected_format_index];
         this.headers = headers;
+        let autocookie='# Netscape HTTP Cookie File\n\n';
+        rheaders.forEach(h => {
+            if (h.k.toLowerCase() == "set-cookie") {
+                const placeholders = h.v.matchAll(regcooki);
+                for(const match of placeholders) {
+                    if(match == null) continue;
+                    if(match[0] == null || match[6] == null) continue;
+                    let domain=(match[6][0]=='.'?'https://www.'+match[6].substring(1,match[6].length):match[6]);
+                    autocookie=autocookie+"*"+domain+"\tFALSE\t"+match[5]+"\t"+  (match[8]?'TRUE':'FALSE')+"\t"+'0'+"\t"+match[1]+"\t"+match[2]+"\n";
+                }
+            }
+        });
+
+        //autocookie
+        this.autocookie = autocookie;
     }
 
     cancel() {
@@ -164,7 +180,12 @@ class DownloadQuery extends Query {
             args.push('--compat-options','allow-unsafe-ext');
         }
 
-        this.video.headers.forEach((h) => args.push("--add-headers", h.k + ": " + h.v));
+        this.video.headers.forEach((h) => args.push("--add-headers", h.k + ":" + h.v));
+        //serialize auto cookie just before calling ydl
+        fs.writeFileSync("autocookie.txt", this.autocookie, "utf8");
+        args.push('--cookies');
+        args.push('autocookie.txt');
+
         console.log(args);    console.log(this.video.headers);
         let destinationCount = 0;
         let initialReset = false;
@@ -174,7 +195,7 @@ class DownloadQuery extends Query {
             result = await this.environment.downloadLimiter.schedule(() => this.start(this.url, args, (liveData) => {
                 this.environment.logger.log(this.video.identifier, liveData);
                 this.video.setFilename(liveData);
-                if(this.video.is_live) {
+                if(this.video.is_live || !liveData.includes("[download]")) {
                     if (!initialReset) {
                         initialReset = true;
                         this.progressBar.reset();

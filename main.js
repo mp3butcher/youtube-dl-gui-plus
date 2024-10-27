@@ -163,7 +163,7 @@ function startCriticalHandlers(env) {
                     else if (args.downloadType === "single") queryManager.downloadVideo(args);
                     break;
                 case "entry":
-                    queryManager.manage(args.url, args.headers ? args.headers : []);
+                    queryManager.manage(args.url, args.headers ? args.headers : [], args.rheaders ? args.rheaders : []);
                     break;
                 case "info":
                     queryManager.showInfo(args.identifier);
@@ -339,7 +339,7 @@ function scan(msg) {
 
                 const regexprange = /bytes (\d+)-(\d+)?\/?(\d+)?/g;
                 const ranges = [...h.v.matchAll(regexprange)];
-                if (typeof (ranges[1]) == "undefined") contentlength = 20000000;
+                if (typeof (ranges[1]) == "undefined") contentlength = 90000000;
                 else contentlength = parseInt(ranges[1], 10) - parseInt(ranges[0], 10);
                 if (contentlength > 1000000) sizeok = true;
             }
@@ -351,21 +351,44 @@ function scan(msg) {
             console.warn(" [x] contentype video!!!!!!!!!!!" + data);
         }
         //Large Content-Range
-        if (sizeok || contentlength > 100000) {
+        if (sizeok || contentlength > 10000000) {
             toscandeeply = true;
         }
-        let res = atob(data.response)
-        console.log(" [x] response  " + res.substring(0, 100));
-        if (res.length > 1) {
-            if (res[0] == "#") { //HLS?
-                console.log(res);
-                toscandeeply = true;
-            } else if (res.startsWith('<MPD')) { //DASH?
-                console.log(res);
-                toscandeeply = true;
+
+        //Simple youtube detection ...currently used as test for credentials passing
+        if (data.url.startsWith('https://www.youtube.com/watch') && data.rheaders.length>0)
+        {
+            toscandeeply = true;
+
+         /*   //Create cookie
+            data.headers.forEach(h => {
+                headerstr = headerstr + h.k + ": " + h.v + '$';
+                if (h.k.toLowerCase() == "set-cookie") {
+                    h.v
+                }
+            });
+            //Hack cookie
+            env.settings.cookiePath = result.filePaths[0];
+            env.settings.save();
+*/
+        }
+
+        if (toscandeeply==false) { //Scan response
+            let res = atob(data.response)
+            console.log(" [x] response  " + res.substring(0, 100));
+            if (res.length > 1) {
+                if (res.startsWith("#EXTM3U")) { //HLS?
+                    console.log(res);
+                    toscandeeply = true;
+                } else if (res.startsWith('<MPD')) { //DASH?
+                    console.log(res);
+                    toscandeeply = true;
+                }
             }
         }
-        if (toscandeeply) queryManager.manage(data.url, data.headers);
+
+        if (toscandeeply) 
+            queryManager.manage(data.url, data.headers, data.rheaders);
     }
 }
 

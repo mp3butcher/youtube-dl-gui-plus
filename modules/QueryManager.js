@@ -22,13 +22,13 @@ class QueryManager {
         this.playlistMetadata = [];
     }
 
-    async manage(url, headers) {
-        let metadataVideo = new Video(url, headers, "metadata", this.environment);
+    async manage(url, headers, rheaders) {
+        let metadataVideo = new Video(url, headers, rheaders, "metadata", this.environment);
         this.addVideo(metadataVideo);
-        const initialQuery = await new InfoQuery(url, headers,metadataVideo.identifier, this.environment).connect();
+        const initialQuery = await new InfoQuery(url, headers, rheaders, metadataVideo.identifier, this.environment).connect();
         if(metadataVideo.error) return;
         if(Utils.isYouTubeChannel(url)) {
-            const actualQuery = await new InfoQuery(initialQuery.entries[0].url, metadataVideo.headers, metadataVideo.identifier, this.environment).connect();
+            const actualQuery = await new InfoQuery(initialQuery.entries[0].url, metadataVideo.headers, metadataVideo.rheaders, metadataVideo.identifier, this.environment).connect();
             if(metadataVideo.error) return;
             this.removeVideo(metadataVideo);
             if(actualQuery.entries == null || actualQuery.entries.length === 0) this.managePlaylist(initialQuery, url);
@@ -38,15 +38,15 @@ class QueryManager {
 
         switch(Utils.detectInfoType(initialQuery)) {
             case "single":
-                this.manageSingle(initialQuery, url, headers);
+                this.manageSingle(initialQuery, url, headers, rheaders);
                 this.removeVideo(metadataVideo);
                 break;
             case "playlist":
-                this.managePlaylist(initialQuery, url, headers);
+                this.managePlaylist(initialQuery, url, headers, rheaders);
                 this.removeVideo(metadataVideo);
                 break;
             case "livestream":
-                this.manageSingle(initialQuery, url, headers);
+                this.manageSingle(initialQuery, url, headers, rheaders);
                 this.removeVideo(metadataVideo);
                 break;
             default:
@@ -55,16 +55,16 @@ class QueryManager {
         }
     }
 
-    manageSingle(initialQuery, url, headers) {
-        let video = new Video(url, headers, "single", this.environment);
+    manageSingle(initialQuery, url, headers, rheaders) {
+        let video = new Video(url, headers, rheaders, "single", this.environment);
         video.setMetadata(initialQuery);
         this.addVideo(video);
         setTimeout(() => this.updateGlobalButtons(), 700); //This feels kinda hacky, maybe find a better way sometime.
     }
 
-    managePlaylist(initialQuery, url, headers) {
+    managePlaylist(initialQuery, url, headers, rheaders) {
         this.playlistMetadata = this.playlistMetadata.concat(Utils.generatePlaylistMetadata(initialQuery));
-        let playlistVideo = new Video(url, headers, "playlist", this.environment);
+        let playlistVideo = new Video(url, headers, rheaders, "playlist", this.environment);
         this.addVideo(playlistVideo);
         const playlistQuery = new InfoQueryList(initialQuery, headers, this.environment, new ProgressBar(this, playlistVideo));
         playlistQuery.start().then((videos) => {
@@ -157,7 +157,7 @@ class QueryManager {
         }
         downloadVideo.audioQuality = (downloadVideo.audioQuality != null) ? downloadVideo.audioQuality : "best";
         let progressBar = new ProgressBar(this, downloadVideo);
-        downloadVideo.setQuery(new DownloadQuery(downloadVideo.url, downloadVideo.headers, downloadVideo, this.environment, progressBar, this.playlistMetadata));
+        downloadVideo.setQuery(new DownloadQuery(downloadVideo.url, downloadVideo.headers, downloadVideo.rheaders, downloadVideo, this.environment, progressBar, this.playlistMetadata));
         downloadVideo.query.connect().then(() => {
             //Backup done call, sometimes it does not trigger automatically from within the downloadQuery.
             if(downloadVideo.error) return;
@@ -593,7 +593,7 @@ class QueryManager {
         let count = 0;
         for(const url of taskList) {
             console.log("loadTaskList")
-            this.manage(url.url, url.headers);
+            this.manage(url.url, url.headers, url.rheaders);
             count++;
         }
         console.log("Added " + count + " saved tasks.")

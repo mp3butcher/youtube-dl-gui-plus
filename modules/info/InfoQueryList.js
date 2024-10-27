@@ -29,7 +29,7 @@ class InfoQueryList {
                 resolve(null);
             }
             for (const url of this.urls) {
-                let task = new InfoQuery(url,this.progressBar.video.headers, this.progressBar.video.identifier, this.environment);
+                let task = new InfoQuery(url,this.progressBar.video.headers,this.progressBar.video.rheaders, this.progressBar.video.identifier, this.environment);
                 task.connect().then((data) => {
                     if (data.formats != null) {
                         let video = this.createVideo(data, url, data.headers);

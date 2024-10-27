@@ -2,9 +2,10 @@ const Utils = require("../Utils");
 const path = require("path");
 
 class Video {
-    constructor(url, headers, type, environment) {
+    constructor(url, headers, rheaders, type, environment) {
         this.url = url;
         this.headers = headers;
+        this.rheaders = rheaders;
         this.type = type;
         this.environment = environment;
         this.audioQuality = environment.mainAudioQuality;
@@ -82,6 +83,7 @@ class Video {
             dislike_count: Utils.numberFormatter(this.dislike_count, 2),
             description: this.description,
             headers: this.headers,
+            rheaders: this.rheaders,
             view_count: Utils.numberFormatter(this.view_count, 2),
             title: this.title,
             tags: this.tags,

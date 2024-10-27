@@ -13,8 +13,7 @@ class Query {
     stop() {
         this.stopped = true;
         if(this.process != null) {
-            if (this.progressBar.video.is_live) process.kill(this.process.pid, 'SIGINT');/// Only way to stop ffmpeg lives
-            else this.process.kill();
+            process.kill(this.process.pid, 'SIGINT');/// Only way I found to stop ffmpeg through ydl
         }
     }
 
@@ -44,6 +43,10 @@ class Query {
             args.push("--cookies");
             args.push(this.environment.settings.cookiePath);
         }
+        else{
+//generate a cookie from headers kkkkkkk
+
+        }       
 
         if(this.environment.settings.rateLimit !== "") {
             args.push("--limit-rate");
@@ -57,7 +60,7 @@ class Query {
         }
 
         args.push(url) //Url must always be added as the final argument
-
+ console.log(args.join(' '))
         let command = this.environment.paths.ytdl; //Set the command to be executed
 
         if(this.environment.pythonCommand !== "python") { //If standard python is not available use another install if detected
