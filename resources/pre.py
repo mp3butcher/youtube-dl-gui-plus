@@ -5,10 +5,10 @@ from pywidevine.pssh import PSSH
 
 from pathlib import Path
 import json
-import js  
+import js
 import base64
 from pyodide.http import pyfetch
- 
+
 
 def blobsToDevice(cID, pKey):
     return Device(client_id=cID, private_key=pKey, type_=DeviceTypes['ANDROID'], security_level=3, flags=None)
@@ -42,7 +42,7 @@ async def loadCdm():
         remote_conf=await (await pyfetch("/remote.json")).json()
         return RemoteCdm(**remote_conf)
     except Exception as e:
-        #js.document.getElementById('result').value=f"No CDM key pair found! \n\n https://github.com/FoxRefire/wvg/wiki/Getting-started#2-put-cdm-key-pair-files"
+        #TODO
         raise Exception(e)
 
 # Define corsFetch API for requesting server that require origin header

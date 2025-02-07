@@ -1,7 +1,7 @@
 try:
     cdm.parse_license(session_id, licence)
 except Exception as e:
-    #js.document.getElementById('result').value=f"Could not decrypt!\n\nLicense Response:\n{licence}\n\nhttps://github.com/FoxRefire/wvg/wiki/How-to-add-custom-license-scheme-yourself"
+    #TODO
     raise Exception(e)
 
 # get keys
