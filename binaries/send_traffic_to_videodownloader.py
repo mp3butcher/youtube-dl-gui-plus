@@ -4,6 +4,7 @@ import socket, threading
 import queue
 import time
 import json
+import json
 
 from mitmproxy import ctx
 from mitmproxy import http
@@ -69,6 +70,7 @@ class TrafficLogger:
     return
 
   def checkflow(self,flow,isrep):
+    h=[]
     h=[]
     for k, v in flow.request.headers.items():
         h.append({"k":k,"v":v})
