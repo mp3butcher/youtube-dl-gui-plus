@@ -82,6 +82,7 @@
     ],
     "afterPack": "./build/appimage-fix.js",
     "appId": "com.mp3butcher.youtube-dl-gui-plus",
+    "asarUnpack": "**/binaries/*",
     "appx": {
       "backgroundColor": "#292929",
       "displayName": "Open Video Downloader Plus",
