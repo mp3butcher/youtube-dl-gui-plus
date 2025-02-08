@@ -265,7 +265,7 @@ app.on('ready', async () => {
     await env.initialize();
     let baseappdir = app.isPackaged ? path.dirname(env.paths.packedPrefix) : '.';    
 	let basewheels = app.isPackaged ? path.join(baseappdir, "resources/libs/wheels/") : "./resources/libs/wheels/"
-    let pyodidepath = app.isPackaged ?  path.join(baseappdir,'resources/pyodide/') : path.join(baseappdir,'node_modules/pyodide');
+    let pyodidepath = app.isPackaged ?  path.join(baseappdir,'resources/pyodide/') : 'node_modules/pyodide';
     let somepackages = [
         "certifi-2024.2.2-py3-none-any.whl","charset_normalizer-3.3.2-py3-none-any.whl",
         "construct-2.8.8-py2.py3-none-any.whl","idna-3.6-py3-none-any.whl",
