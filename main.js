@@ -263,7 +263,7 @@ app.on('ready', async () => {
     app.setAppUserModelId("com.mp3butcher.youtube-dl-gui");
     env = new Environment(app);
     await env.initialize();
-    let baseappdir = app.isPackaged ? path.dirname(env.paths.packedPrefix) : app.getAppPath();
+    let baseappdir = app.isPackaged ? path.dirname(env.paths.packedPrefix) : '.';
     let pyodidepath = app.isPackaged ?  path.join(baseappdir,'resources/pyodide/') : path.join(baseappdir,'node_modules/pyodide');
     let somepackages = [
         "certifi-2024.2.2-py3-none-any.whl","charset_normalizer-3.3.2-py3-none-any.whl",
