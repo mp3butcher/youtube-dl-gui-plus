@@ -21,6 +21,11 @@ export interface NetworkSettings {
   proxy: string | null;
   impersonate: string;
 }
+export interface MitmproxySettings {
+  mitmPort: number;
+  mitmExtraArgs: string;
+  headerFilter:  string[] ;
+}
 
 export interface VideoOutputSettings {
   policy: TranscodePolicy;
@@ -118,6 +123,7 @@ export interface Settings {
   appearance: AppearanceSettings;
   auth: AuthSettings;
   network: NetworkSettings;
+  mitmproxy: MitmproxySettings;
   input: InputSettings;
   output: OutputSettings;
   performance: PerformanceSettings;
@@ -136,6 +142,12 @@ export const defaultAppearanceSettings: AppearanceSettings = {
 export const defaultAuthSettings: AuthSettings = {
   cookieFile: null,
   cookieBrowser: 'none',
+};
+
+export const defaultMitmproxySettings: MitmproxySettings = {
+  mitmPort: 15930,
+  mitmExtraArgs: '--anticache --anticomp --mode socks5',
+  headerFilter: ["if-range", "if-none-match", "if-modified-since", "if-match", "if-unmodified-since", "sec-ch-ua"],
 };
 
 export const defaultNetworkSettings: NetworkSettings = {
@@ -208,6 +220,7 @@ export const defaultSettings: Settings = {
   appearance: defaultAppearanceSettings,
   auth: defaultAuthSettings,
   network: defaultNetworkSettings,
+  mitmproxy: defaultMitmproxySettings,
   input: defaultInputSettings,
   output: {
     ...defaultOutputSettings,

@@ -75,6 +75,7 @@ import SettingsUpdate from '../../components/settings/SettingsUpdate.vue';
 import SettingsInput from '../../components/settings/SettingsInput.vue';
 import SettingsSystem from '../../components/settings/SettingsSystem.vue';
 import SettingsNotifications from '../../components/settings/SettingsNotifications.vue';
+import SettingsMitmproxy from '../../components/settings/SettingsMitmproxy.vue';
 
 const settingsStore = useSettingsStore();
 const toastStore = useToastStore();
@@ -121,6 +122,7 @@ const sections = [
   SettingsAppearance,
   SettingsNotifications,
   SettingsNetwork,
+  SettingsMitmproxy,
   SettingsUpdate,
   SettingsSystem,
   SettingsSponsorBlock,

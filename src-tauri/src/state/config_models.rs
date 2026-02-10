@@ -55,6 +55,31 @@ impl Default for NetworkSettings {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(default, rename_all = "camelCase")]
+pub struct MitmproxySettings {
+  pub mitm_port: u16,
+  pub mitm_extra_args: String,
+  pub header_filter: Vec<String>,
+}
+
+impl Default for MitmproxySettings {
+  fn default() -> Self {
+    Self {
+      mitm_port: 15930,
+      mitm_extra_args: "--anticache --anticomp --mode socks5".into(),
+      header_filter: vec![
+        "if-range".into(),
+        "if-none-match".into(),
+        "if-modified-since".into(),
+        "if-match".into(),
+        "if-unmodified-since".into(),
+        "sec-ch-ua".into(),
+      ],
+    }
+  }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(default, rename_all = "camelCase")]
 pub struct InputSettings {
   pub auto_fill_clipboard: bool,
   pub prefer_video_in_mixed_links: bool,
@@ -271,6 +296,7 @@ pub struct Config {
   pub appearance: AppearanceSettings,
   pub auth: AuthSettings,
   pub network: NetworkSettings,
+  pub mitmproxy: MitmproxySettings,
   pub input: InputSettings,
   pub output: OutputSettings,
   pub performance: PerformanceSettings,
