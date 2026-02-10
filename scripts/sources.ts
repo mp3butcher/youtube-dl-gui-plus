@@ -62,6 +62,8 @@ async function latestRelease(owner: string, repo: string): Promise<GitHubRelease
   return release;
 }
 
+
+
 function assetUrl(rel: GitHubRelease, name: string): string {
   const asset = rel.assets.find(a => a.name === name);
   if (!asset) throw new Error(`missing asset ${name}`);
@@ -74,6 +76,7 @@ export async function fetchSources(): Promise<ToolSource[]> {
   const ffRel = await latestRelease('eugeneware', 'ffmpeg-static');
   const denoRel = await latestRelease('denoland', 'deno');
   const apRel = await latestRelease('wez', 'atomicparsley');
+  const mpRel = await latestRelease('mitmproxy', 'mitmproxy');
 
   console.log('[sources] Successfully resolved tool metadata');
 
@@ -171,6 +174,18 @@ export async function fetchSources(): Promise<ToolSource[]> {
         'darwin-x86_64': { entry: 'AtomicParsley', url: assetUrl(apRel, 'AtomicParsleyMacOS.zip') },
       },
     },
+    {
+      name: 'mitmproxy',
+      version: mpRel.tag_name,
+      files: {
+        'linux-x86_64': { entry: 'mitmweb', url: 'https://downloads.mitmproxy.org/' + mpRel.tag_name.slice(1, mpRel.tag_name.length) + '/mitmproxy-' 
+          + mpRel.tag_name.slice(1, mpRel.tag_name.length) + '-' + 'linux-x86_64.tar.gz' },
+        'windows-x86_64': { entry: 'mitmweb.exe', url: 'https://downloads.mitmproxy.org/' + mpRel.tag_name.slice(1, mpRel.tag_name.length) + '/mitmproxy-' 
+          + mpRel.tag_name.slice(1, mpRel.tag_name.length) + '-' + 'windows-x86_64.zip' },
+        'darwin-x86_64': { entry: 'mitmweb', url: 'https://downloads.mitmproxy.org/' + mpRel.tag_name.slice(1, mpRel.tag_name.length) + '/mitmproxy-' 
+          + mpRel.tag_name.slice(1, mpRel.tag_name.length) + '-' + 'macos-x86_64.tar.gz' },
+      },
+    },
   ];
 }
 
@@ -194,5 +209,9 @@ export const TOOL_LICENSES: Record<string, ToolLicense> = {
   'AtomicParsley': {
     license: 'GPL-2.0-or-later',
     url: 'https://github.com/wez/atomicparsley',
+  },
+  'mitmproxy': {
+    license: 'MIT',
+    url: 'https://github.com/mitmproxy/mitmproxy',
   },
 };

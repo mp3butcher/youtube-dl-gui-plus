@@ -4,6 +4,7 @@ import path from 'node:path';
 import https from 'node:https';
 import { createHash } from 'node:crypto';
 import * as unzipper from 'unzipper';
+import * as tar from 'tar';
 import { main as generateManifest } from './gen-manifest.ts';
 
 export interface FileEntry {
@@ -146,6 +147,35 @@ async function extractZipSingleEntry(
   });
 }
 
+async function extractTarGzEntire(tarPath: string, destDir: string) {
+  await ensureDir(destDir);
+  await tar.x({ file: tarPath, cwd: destDir });
+}
+
+async function extractTarGzSingleEntry(
+  tarPath: string,
+  entryPath: string,
+  destPath: string,
+) {
+  await ensureDir(path.dirname(destPath));
+
+  const tempDir = await fsp.mkdtemp(path.join(BIN_ROOT, `.tmp-tar-`));
+  try {
+    await tar.x({ file: tarPath, cwd: tempDir });
+
+    const src = path.join(tempDir, entryPath);
+    try {
+      await fsp.access(src);
+    } catch {
+      throw new Error(`Entry "${entryPath}" not found in ${tarPath}`);
+    }
+
+    await fsp.rename(src, destPath);
+  } finally {
+    await fsp.rm(tempDir, { recursive: true, force: true });
+  }
+}
+
 async function makeExecutableIfNeeded(filePath: string) {
   if (process.platform === 'win32') return;
   try {
@@ -180,8 +210,10 @@ async function processTool(
   await downloadWithSha256(url, expectedSha, downloadPath);
 
   const isZip = baseName.toLowerCase().endsWith('.zip');
+  const lower = baseName.toLowerCase();
+  const isTarGz = lower.endsWith('.tar.gz') || lower.endsWith('.tgz');
 
-  if (isZip) {
+  if (isZip || isTarGz) {
     if (file.bundle) {
       const bundle = file.bundle;
       const tempDir = path.join(
@@ -197,11 +229,19 @@ async function processTool(
       if (bundle.keep_folder) {
         entrySource = path.join(BIN_ROOT, bundle.entry);
         console.log(`[fetch-sources] Extracting bundle to bin dir ${BIN_ROOT}`);
-        await extractZipEntire(downloadPath, BIN_ROOT);
+        if (isZip) {
+          await extractZipEntire(downloadPath, BIN_ROOT);
+        } else {
+          await extractTarGzEntire(downloadPath, BIN_ROOT);
+        }
       } else {
         entrySource = path.join(tempDir, bundle.entry);
         console.log(`[fetch-sources] Extracting bundle to temp dir ${tempDir}`);
-        await extractZipEntire(downloadPath, tempDir);
+        if (isZip) {
+          await extractZipEntire(downloadPath, tempDir);
+        } else {
+          await extractTarGzEntire(downloadPath, tempDir);
+        }
       }
 
       console.log(`[fetch-sources] Moving ${bundle.entry} -> ${destPath}`);
@@ -214,12 +254,20 @@ async function processTool(
       const destName = path.basename(file.entry);
       const destPath = path.join(BIN_ROOT, destName);
       console.log(`[fetch-sources] Extracting entry ${file.entry} -> ${destPath}`);
-      await extractZipSingleEntry(downloadPath, file.entry, destPath);
+      if (isZip) {
+        await extractZipSingleEntry(downloadPath, file.entry, destPath);
+      } else {
+        await extractTarGzSingleEntry(downloadPath, file.entry, destPath);
+      }
       await makeExecutableIfNeeded(destPath);
       await fsp.rm(downloadPath, { force: true });
     } else {
       console.log(`[fetch-sources] Extracting entire archive into bin/`);
-      await extractZipEntire(downloadPath, BIN_ROOT);
+      if (isZip) {
+        await extractZipEntire(downloadPath, BIN_ROOT);
+      } else {
+        await extractTarGzEntire(downloadPath, BIN_ROOT);
+      }
       await fsp.rm(downloadPath, { force: true });
     }
   } else {
@@ -259,6 +307,8 @@ async function main() {
   const manifest = await generateManifest();
 
   for (const [toolName, tool] of Object.entries(manifest.tools)) {
+    console.log(`processTool: ${toolName}\n`);
+
     await processTool(toolName, tool, platformKey);
   }
 
