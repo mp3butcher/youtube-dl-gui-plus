@@ -4,3 +4,4 @@ pub mod ytdlp_download;
 pub mod ytdlp_info;
 pub mod ytdlp_process;
 pub mod ytdlp_runner;
+pub mod mitmproxy_runner;

@@ -16,6 +16,7 @@ mod window;
 use crate::binaries::binaries_manager::BinariesManager;
 use crate::binaries::binaries_state::BinariesState;
 use crate::commands::*;
+use crate::commands::scanner::TcpScannerState;
 use crate::i18n::I18nManager;
 use crate::logging::LogStoreState;
 use crate::menu::setup_menu;
@@ -120,6 +121,9 @@ pub fn run() {
       // manage log store
       handle.manage(LogStoreState::new());
 
+      // setup TCP scanner
+      handle.manage(TcpScannerState::new());
+
       // setup dispatchers
       let cfg_snapshot = handle.state::<SharedConfig>().load();
       let max_concurrency = cfg_snapshot.performance.max_concurrency;
@@ -174,6 +178,7 @@ pub fn run() {
       preferences_set,
       binaries_check,
       binaries_ensure,
+      mitmproxy_script_ensure,
       updater_check,
       updater_download,
       updater_install,
@@ -184,6 +189,8 @@ pub fn run() {
       stronghold_set,
       get_platform,
       notify,
+      start_tcp_scanner,
+      stop_tcp_scanner,
     ])
     .build(tauri::generate_context!())
     .expect("error while running tauri application");

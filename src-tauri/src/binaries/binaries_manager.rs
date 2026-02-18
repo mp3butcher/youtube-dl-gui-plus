@@ -6,6 +6,7 @@ use crate::binaries::binaries_extractor::{
 };
 use crate::binaries::binaries_state::CheckResult;
 use crate::paths::PathsManager;
+use crate::commands::scanner;
 use base64::Engine;
 use ed25519_dalek::{Signature, Verifier, VerifyingKey};
 use fs_extra::dir::{move_dir, CopyOptions};
@@ -254,6 +255,20 @@ impl BinariesManager {
       return Err("one or more tools failed to install".into());
     }
 
+    Ok(())
+  }
+
+  /// put the script in the binary directory
+  pub async fn ensure_mitmproxy_script(&self) -> Result<(), AnyError> {
+    let bin = &self.bin_dir;
+    tokio::fs::create_dir_all(&bin).await?;
+
+    let script_path = bin.join("send_traffic_to_videodownloader.py");
+
+    if script_path.exists() {
+      return Ok(());
+    }
+    tokio::fs::write(&script_path, scanner::MITMPROXY_SCRIPT_ENSURE_STRING).await?;
     Ok(())
   }
 

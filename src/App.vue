@@ -24,6 +24,9 @@ const checkTools = async () => {
     await router.push('/install');
   }
 };
+const checkensureMitmproxyScript = async () => {
+  await binariesStore.checkMitmproxyScript();
+};
 
 const checkUpdates = async () => {
   try {
@@ -35,6 +38,7 @@ const checkUpdates = async () => {
 
 try {
   void checkTools();
+  void checkensureMitmproxyScript();
 } catch (e) {
   console.error(e);
 }

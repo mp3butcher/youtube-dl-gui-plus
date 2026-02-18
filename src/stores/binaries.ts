@@ -28,6 +28,10 @@ export const useBinariesStore = defineStore('binaries', () => {
     await invoke<void>('binaries_ensure', { tools: toEnsure ?? Object.keys(tools.value) });
   }
 
+  async function checkMitmproxyScript()  {
+    await invoke<void>('mitmproxy_script_ensure', {});
+  }
+
   function processBinaryDownloadStart(payload: BinaryDownloadStartPayload) {
     const tool = tools.value[payload.tool];
     tool.version = payload.version;
@@ -51,5 +55,5 @@ export const useBinariesStore = defineStore('binaries', () => {
     tool.error = `[${payload.stage}] ${payload.error}`;
   }
 
-  return { tools, check, ensure, processBinaryDownloadStart, processBinaryDownloadProgress, processBinaryDownloadError, processBinaryDownloadComplete };
+  return { tools, check, checkMitmproxyScript, ensure, processBinaryDownloadStart, processBinaryDownloadProgress, processBinaryDownloadError, processBinaryDownloadComplete };
 });
