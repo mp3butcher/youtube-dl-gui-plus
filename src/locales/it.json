@@ -542,6 +542,22 @@
         }
       }
     },
+    "mitmproxy": {
+      "legend": "Scanner di rete",
+      "legendLabel": "Configura il mitmproxy integrato per ispezionare il traffico HTTP.",
+      "hint": "vedi il tutorial per configurare un browser tramite questo proxy.",
+      "mitmPort": {
+        "label": "Porta:"
+      },
+      "mitmExtraArgs": {
+        "label": "Argomenti aggiuntivi:",
+        "hint": "Argomenti aggiuntivi della riga di comando per mitmproxy."
+      },
+      "headerFilter": {
+        "label": "Filtro intestazioni:",
+        "hint": "Una intestazione per riga da includere nei log."
+      }
+    },
     "sponsorBlock": {
       "legend": "SponsorBlock",
       "legendLabel": "Rimuovi o contrassegna parti di un video.",

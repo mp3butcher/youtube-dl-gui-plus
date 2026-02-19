@@ -542,6 +542,22 @@
         }
       }
     },
+    "mitmproxy": {
+      "legend": "Netzwerk-Scanner",
+      "legendLabel": "Konfiguriere den eingebetteten mitmproxy, um HTTP-Verkehr zu untersuchen.",
+      "hint": "Siehe Anleitung, um einen Browser über diesen Proxy einzurichten.",
+      "mitmPort": {
+        "label": "Port:"
+      },
+      "mitmExtraArgs": {
+        "label": "Zusätzliche Argumente:",
+        "hint": "Zusätzliche Kommandozeilenargumente für mitmproxy."
+      },
+      "headerFilter": {
+        "label": "Header-Filter:",
+        "hint": "Ein Header pro Zeile, der in den Logs enthalten sein soll."
+      }
+    },
     "sponsorBlock": {
       "legend": "SponsorBlock",
       "legendLabel": "Entferne oder markiere Teile eines Videos.",

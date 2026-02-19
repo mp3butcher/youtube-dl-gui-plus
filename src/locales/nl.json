@@ -542,6 +542,22 @@
         }
       }
     },
+    "mitmproxy": {
+      "legend": "Netwerkscanner",
+      "legendLabel": "Configureer de ingebouwde mitmproxy om HTTP-verkeer te inspecteren.",
+      "hint": "zie de handleiding om een browser via deze proxy in te stellen.",
+      "mitmPort": {
+        "label": "Poort:"
+      },
+      "mitmExtraArgs": {
+        "label": "Extra argumenten:",
+        "hint": "Extra opdrachtregelargumenten voor mitmproxy."
+      },
+      "headerFilter": {
+        "label": "Headerfilter:",
+        "hint": "Eén header per regel om in de logs op te nemen."
+      }
+    },
     "sponsorBlock": {
       "legend": "SponsorBlock",
       "legendLabel": "Verwijder of markeer delen van een video.",

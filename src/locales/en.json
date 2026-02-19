@@ -542,6 +542,22 @@
         }
       }
     },
+    "mitmproxy": {
+      "legend": "Network Scanner",
+      "legendLabel": "Configure the embedded mitmproxy used to inspect HTTP traffic.",
+      "hint": "see tutorial to setup a browser through this proxy.",
+      "mitmPort": {
+        "label": "mitmproxy port:"
+      },
+      "mitmExtraArgs": {
+        "label": "mitmproxy extra arguments:",
+        "hint": "Additional command-line arguments for mitmproxy."
+      },
+      "headerFilter": {
+        "label": "Header filter:",
+        "hint": "One header per line to include in logs."
+      }
+    },
     "sponsorBlock": {
       "legend": "SponsorBlock",
       "legendLabel": "Remove or mark parts of a video.",

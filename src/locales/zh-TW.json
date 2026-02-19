@@ -542,6 +542,22 @@
         }
       }
     },
+    "mitmproxy": {
+      "legend": "網路掃描器",
+      "legendLabel": "設定內建的 mitmproxy，用於檢查 HTTP 流量。",
+      "hint": "請參閱教學以設定瀏覽器通過此代理。",
+      "mitmPort": {
+        "label": "埠："
+      },
+      "mitmExtraArgs": {
+        "label": "額外參數：",
+        "hint": "給 mitmproxy 的額外命令列參數。"
+      },
+      "headerFilter": {
+        "label": "標頭篩選：",
+        "hint": "每行一個標頭，包含於日誌中。"
+      }
+    },
     "sponsorBlock": {
       "legend": "SponsorBlock",
       "legendLabel": "移除或標記影片中的部分片段。",

@@ -542,6 +542,21 @@
         }
       }
     },
+    "mitmproxy": {
+      "legend": "Mitmproxy",
+      "legendLabel": "Configure o mitmproxy incorporado usado para inspecionar e modificar solicitações HTTP.",
+      "mitmPort": {
+        "label": "Porta:"
+      },
+      "mitmExtraArgs": {
+        "label": "Argumentos extras:",
+        "hint": "Argumentos de linha de comando adicionais para o mitmproxy."
+      },
+      "headerFilter": {
+        "label": "Filtro de cabeçalho:",
+        "hint": "Um cabeçalho por linha para incluir nos registros."
+      }
+    },
     "sponsorBlock": {
       "legend": "SponsorBlock",
       "legendLabel": "Remova ou marque partes de um vídeo.",

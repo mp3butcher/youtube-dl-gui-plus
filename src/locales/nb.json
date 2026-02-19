@@ -542,6 +542,22 @@
         }
       }
     },
+    "mitmproxy": {
+      "legend": "Nettverksskanner",
+      "legendLabel": "Konfigurer den innebygde mitmproxy for å inspisere HTTP-trafikk.",
+      "hint": "se veiledningen for å sette opp en nettleser gjennom denne proxyen.",
+      "mitmPort": {
+        "label": "Port:"
+      },
+      "mitmExtraArgs": {
+        "label": "Ekstra argumenter:",
+        "hint": "Ekstra kommandolinjeargumenter for mitmproxy."
+      },
+      "headerFilter": {
+        "label": "Header-filter:",
+        "hint": "Én header per linje som skal inkluderes i loggene."
+      }
+    },
     "sponsorBlock": {
       "legend": "SponsorBlock",
       "legendLabel": "Fjern eller merk deler av en video.",
