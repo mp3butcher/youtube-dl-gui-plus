@@ -98,9 +98,9 @@ pub async fn start_tcp_scanner(
                     }
 
                     let readyread = socket.ready(Interest::READABLE).await.unwrap();
-
                     if readyread.is_readable() 
                     {
+                        let _ = socket.readable().await.unwrap();
                         match socket.try_read(&mut buffer) {
                             Ok(0) => {
                                 eprintln!("[DEBUG] Connection closed");
@@ -119,26 +119,25 @@ pub async fn start_tcp_scanner(
                                             let msg = json_msg.message.unwrap_or_else(|| {
                                                 json_msg.extra.to_string()
                                             });
-                                            //eprintln!("[JSON PARSED] {}", msg);
                                             let _ = app_clone.emit("tcp_scanner", ScannerMessage {
                                                 message: msg,
                                             });
                                         }
                                         Err(e) => {
                                             eprintln!("[JSON PARSE ERROR] {}", e);
-                                           /* let _ = app_clone.emit("tcp_scanner", ScannerMessage {
-                                                message: format!("JSON parse error: {}", e),
-                                            });*/
                                         }
                                     }
                                 }
                             }
+                            Err(ref e) if e.kind() == tokio::io::ErrorKind::WouldBlock => {
+                                continue;
+                            }
                             Err(e) => {
                                 eprintln!("[TCP ERROR] {}", e);
-                               /* let _ = app_clone.emit("tcp_scanner", ScannerMessage {
+                                let _ = app_clone.emit("tcp_scanner", ScannerMessage {
                                     message: format!("Error: {}", e),
-                                });*/
-                                //break;
+                                });
+                                break;
                             }
                         }
                     }
@@ -154,10 +153,10 @@ pub async fn start_tcp_scanner(
     });
 
     *connection = Some(TcpStreamHandle {
-        shutdown_flag,
+        shutdown_flag: shutdown_flag,
         mitmweb_child: Some(mitmweb_child),
     });
  
-    eprintln!("[DEBUG] TCP scanner started - mitmweb listening on port {}", mitm_port);
-    Ok(format!("TCP scanner started - mitmweb listening on port {}", mitm_port))
+    eprintln!("[DEBUG] network scanner started - mitmweb listening on port {}", mitm_port);
+    Ok(format!("network scanner started - mitmweb listening on port {}", mitm_port))
 }

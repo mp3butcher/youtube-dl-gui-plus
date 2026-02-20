@@ -42,8 +42,6 @@ pub struct MitmproxyChild {
 
 pub struct MitmproxyRunner<'a> {
   app: &'a AppHandle,
-  cfg: Arc<Config>,
-  prefs: Arc<Preferences>,
   args: Vec<String>,
   bin_dir: PathBuf,
 }
@@ -52,7 +50,8 @@ impl<'a> MitmproxyRunner<'a> {
   pub fn new(app: &'a AppHandle) -> Self {
     let paths_manager = app.state::<PathsManager>();
     let bin_dir = paths_manager.bin_dir().clone();
-    let args = vec![];//"--encoding".into(), "utf-8".into()];
+    let script_path = bin_dir.join("send_traffic_to_videodownloader.py");
+    let args = vec!["-s".to_string(), script_path.display().to_string()];
     let cfg_handle = app.state::<SharedConfig>();
     let cfg = cfg_handle.load();
     let prefs_handle = app.state::<SharedPreferences>();
@@ -60,8 +59,6 @@ impl<'a> MitmproxyRunner<'a> {
 
     Self {
       app,
-      cfg,
-      prefs,
       args,
       bin_dir,
     }
@@ -73,9 +70,6 @@ impl<'a> MitmproxyRunner<'a> {
     S: Into<String>,
   {
     self.args.extend(args.into_iter().map(Into::into));
-    self.args.extend([ "-s".to_string() ]);
-    let script_path = self.bin_dir.join("send_traffic_to_videodownloader.py");
-    self.args.extend([ script_path.display().to_string() ]);
     self
   }
 
