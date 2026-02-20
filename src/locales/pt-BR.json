@@ -546,6 +546,7 @@
     "mitmproxy": {
       "legend": "Mitmproxy",
       "legendLabel": "Configure o mitmproxy incorporado usado para inspecionar e modificar solicitações HTTP.",
+      "hint": "Consulte o tutorial para configurar um navegador através deste proxy.",
       "mitmPort": {
         "label": "Porta:"
       },
