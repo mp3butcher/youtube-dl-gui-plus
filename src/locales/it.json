@@ -26,7 +26,8 @@
     "header": {
       "placeholder": "Inserisci l'URL di un video/playlist da aggiungere alla coda",
       "nav": {
-        "settings": "Impostazioni app"
+        "settings": "Impostazioni app",
+        "networkscan": "Start network scanner (only traffic passing through the proxy)"
       }
     },
     "footer": {

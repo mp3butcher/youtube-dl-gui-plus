@@ -26,7 +26,8 @@
     "header": {
       "placeholder": "Introduce la URL de un video o lista para añadir a la cola",
       "nav": {
-        "settings": "Configuración de la aplicación"
+        "settings": "Configuración de la aplicación",
+        "networkscan": "Start network scanner (only traffic passing through the proxy)"
       }
     },
     "footer": {

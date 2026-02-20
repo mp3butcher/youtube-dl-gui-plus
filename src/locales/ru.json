@@ -26,7 +26,8 @@
     "header": {
       "placeholder": "Введите URL видео или плейлиста, чтобы добавить в очередь",
       "nav": {
-        "settings": "Настройки приложения"
+        "settings": "Настройки приложения",
+        "networkscan": "Start network scanner (only traffic passing through the proxy)"
       }
     },
     "footer": {

@@ -23,10 +23,11 @@
     "resume": "Hervatten"
   },
   "layout": {
-    "header": {
+      "header": {
       "placeholder": "Voer een video- of afspeellijst-URL in om toe te voegen aan de wachtrij",
       "nav": {
-        "settings": "App-instellingen"
+        "settings": "App-instellingen",
+        "networkscan": "Start network scanner (only traffic passing through the proxy)"
       }
     },
     "footer": {

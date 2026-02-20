@@ -26,7 +26,8 @@
     "header": {
       "placeholder": "Skriv inn en video-/spilleliste-URL for å legge til i køen",
       "nav": {
-        "settings": "App-innstillinger"
+        "settings": "App-innstillinger",
+        "networkscan": "Start network scanner (only traffic passing through the proxy)"
       }
     },
     "footer": {

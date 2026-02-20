@@ -23,10 +23,11 @@
     "resume": "繼續"
   },
   "layout": {
-    "header": {
+      "header": {
       "placeholder": "輸入影片/播放清單 URL 以加入佇列",
       "nav": {
-        "settings": "應用程式設定"
+        "settings": "應用程式設定",
+        "networkscan": "Start network scanner (only traffic passing through the proxy)"
       }
     },
     "footer": {

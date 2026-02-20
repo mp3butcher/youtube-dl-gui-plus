@@ -26,7 +26,8 @@
     "header": {
       "placeholder": "Insira o URL de um vídeo/playlist para adicionar à fila.",
       "nav": {
-        "settings": "Configurações do aplicativo"
+        "settings": "Configurações do aplicativo",
+        "networkscan": "Start network scanner (only traffic passing through the proxy)"
       }
     },
     "footer": {

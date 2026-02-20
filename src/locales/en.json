@@ -26,7 +26,8 @@
     "header": {
       "placeholder": "Enter a video/playlist URL to add to the queue",
       "nav": {
-        "settings": "App Settings"
+        "settings": "App Settings",
+        "networkscan": "Start network scanner (only traffic passing through the proxy)"
       }
     },
     "footer": {

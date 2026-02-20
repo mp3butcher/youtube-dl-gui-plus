@@ -26,7 +26,8 @@
     "header": {
       "placeholder": "Entrez l'URL d'une vidéo/playlist pour l'ajouter à la file d'attente",
       "nav": {
-        "settings": "Paramètres de l'application"
+        "settings": "Paramètres de l'application",
+        "networkscan": "Démarrer l'analyse réseau (seulement le trafic passant par le proxy)"
       }
     },
     "footer": {

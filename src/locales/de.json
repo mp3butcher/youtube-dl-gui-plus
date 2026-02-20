@@ -23,10 +23,11 @@
     "resume": "Fortsetzen"
   },
   "layout": {
-    "header": {
+      "header": {
       "placeholder": "Gib eine Video-/Playlist-URL ein, um sie zur Warteschlange hinzuzufügen",
       "nav": {
-        "settings": "App-Einstellungen"
+        "settings": "App-Einstellungen",
+        "networkscan": "Start network scanner (only traffic passing through the proxy)"
       }
     },
     "footer": {
