@@ -98,13 +98,13 @@ jobs:
       - name: Run end-to-end tests with coverage
         run: npm run test:e2e
 
-      - name: Upload e2e coverage to Codecov
-        uses: codecov/codecov-action@v5
-        with:
-          files: coverage/e2e/lcov.info
-          flags: e2e
-          token: ${{ secrets.CODECOV_TOKEN }}
-          fail_ci_if_error: true
+      #- name: Upload e2e coverage to Codecov
+      #  uses: codecov/codecov-action@v5
+      #  with:
+      #    files: coverage/e2e/lcov.info
+      #    flags: e2e
+      #    token: ${{ secrets.CODECOV_TOKEN }}
+      #    fail_ci_if_error: true
 
   build:
     name: 'Build'
