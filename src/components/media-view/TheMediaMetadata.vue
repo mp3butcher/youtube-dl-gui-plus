@@ -46,9 +46,6 @@
           placeholder="key: value&#10;authorization: Bearer token&#10;user-agent: Mozilla/5.0"
           @input="parseUrlHeaders"
       />
-      <div v-if="Object.keys(group?.urlHeaders ?? {}).length > 0" class="text-sm text-base-content/70">
-        {{ Object.keys(group?.urlHeaders ?? {}).length }} header(s) parsed
-      </div>
     </div>
   </section>
 </template>
@@ -83,7 +80,7 @@ function formatUrlHeaders(headers: Record<string, string>): string {
 function parseUrlHeaders(): void {
   const headers: Record<string, string> = {};
   const lines = urlHeadersText.value.split('\n').filter(line => line.trim());
-  
+
   for (const line of lines) {
     const colonIndex = line.indexOf(':');
     if (colonIndex > 0) {
@@ -94,7 +91,7 @@ function parseUrlHeaders(): void {
       }
     }
   }
-  
+
   if (group) {
     group.urlHeaders = Object.keys(headers).length > 0 ? headers : undefined;
   }

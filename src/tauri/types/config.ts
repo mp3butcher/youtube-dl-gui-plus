@@ -24,7 +24,7 @@ export interface NetworkSettings {
 export interface MitmproxySettings {
   mitmPort: number;
   mitmExtraArgs: string;
-  headerFilter:  string[] ;
+  headerFilter: string[];
 }
 
 export interface VideoOutputSettings {
@@ -147,7 +147,7 @@ export const defaultAuthSettings: AuthSettings = {
 export const defaultMitmproxySettings: MitmproxySettings = {
   mitmPort: 15930,
   mitmExtraArgs: '--anticache --anticomp --mode socks5',
-  headerFilter: ["if-range", "if-none-match", "if-modified-since", "if-match", "if-unmodified-since", "sec-ch-ua"],
+  headerFilter: ['if-range', 'if-none-match', 'if-modified-since', 'if-match', 'if-unmodified-since', 'sec-ch-ua'],
 };
 
 export const defaultNetworkSettings: NetworkSettings = {

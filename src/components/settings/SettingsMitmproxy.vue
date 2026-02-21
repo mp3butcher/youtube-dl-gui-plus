@@ -3,7 +3,6 @@
       :legend="t('settings.mitmproxy.legend')"
       :label="t('settings.mitmproxy.legendLabel')"
   >
- 
     <label class="font-semibold mt-2" for="mitmPort">
       {{ t('settings.mitmproxy.mitmPort.label') }}
     </label>
@@ -24,11 +23,9 @@
         v-model="settings.mitmproxy.mitmExtraArgs"
         placeholder="--anticache --anticomp --mode socks5"
     />
-
     <label class="font-semibold mt-2" for="headerFilter">
       {{ t('settings.mitmproxy.headerFilter.label') }}
     </label>
-   
     <textarea
       id="headerFilter"
       class="input mb-2"
@@ -38,13 +35,11 @@
   </base-fieldset>
 </template>
 
-
 <script setup lang="ts">
 
 import BaseFieldset from '../base/BaseFieldset.vue';
 import { Settings } from '../../tauri/types/config.ts';
 import { useI18n } from 'vue-i18n';
-//import { SelectOption } from '../../helpers/forms.ts';
 import { computed } from 'vue';
 
 const { t } = useI18n();

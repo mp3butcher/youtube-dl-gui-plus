@@ -62,8 +62,6 @@ async function latestRelease(owner: string, repo: string): Promise<GitHubRelease
   return release;
 }
 
-
-
 function assetUrl(rel: GitHubRelease, name: string): string {
   const asset = rel.assets.find(a => a.name === name);
   if (!asset) throw new Error(`missing asset ${name}`);
@@ -178,11 +176,11 @@ export async function fetchSources(): Promise<ToolSource[]> {
       name: 'mitmproxy',
       version: mpRel.tag_name,
       files: {
-        'linux-x86_64': { entry: 'mitmweb', url: 'https://downloads.mitmproxy.org/' + mpRel.tag_name.slice(1, mpRel.tag_name.length) + '/mitmproxy-' 
+        'linux-x86_64': { entry: 'mitmweb', url: 'https://downloads.mitmproxy.org/' + mpRel.tag_name.slice(1, mpRel.tag_name.length) + '/mitmproxy-'
           + mpRel.tag_name.slice(1, mpRel.tag_name.length) + '-' + 'linux-x86_64.tar.gz' },
-        'windows-x86_64': { entry: 'mitmweb.exe', url: 'https://downloads.mitmproxy.org/' + mpRel.tag_name.slice(1, mpRel.tag_name.length) + '/mitmproxy-' 
+        'windows-x86_64': { entry: 'mitmweb.exe', url: 'https://downloads.mitmproxy.org/' + mpRel.tag_name.slice(1, mpRel.tag_name.length) + '/mitmproxy-'
           + mpRel.tag_name.slice(1, mpRel.tag_name.length) + '-' + 'windows-x86_64.zip' },
-        'darwin-x86_64': { entry: 'mitmweb', url: 'https://downloads.mitmproxy.org/' + mpRel.tag_name.slice(1, mpRel.tag_name.length) + '/mitmproxy-' 
+        'darwin-x86_64': { entry: 'mitmweb', url: 'https://downloads.mitmproxy.org/' + mpRel.tag_name.slice(1, mpRel.tag_name.length) + '/mitmproxy-'
           + mpRel.tag_name.slice(1, mpRel.tag_name.length) + '-' + 'macos-x86_64.tar.gz' },
       },
     },

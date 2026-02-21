@@ -28,7 +28,7 @@ export const useBinariesStore = defineStore('binaries', () => {
     await invoke<void>('binaries_ensure', { tools: toEnsure ?? Object.keys(tools.value) });
   }
 
-  async function checkMitmproxyScript()  {
+  async function checkMitmproxyScript() {
     await invoke<void>('mitmproxy_script_ensure', {});
   }
 
